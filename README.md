@@ -18,3 +18,4 @@ This repo is all about step 4.
 As I'm currently a NLP Noob , it could take long to optimize my results.    
 Currently I've made a demo using SnowNLP to process data collected in 1 and 3 , but data itself is not in good shape , and the result is far from accurate.    
 用中文说，这结果简直就像算命！    
+

@@ -16,8 +16,9 @@ def inChinese(c):
 allWords={}
 allSents={}
 world = json.load(open('deep_moe_lt4.json'))
-world.extend(json.load(open('deep_moe_gte4.json')))
+world.extend(json.load(open('deep_moe_gte4_alt.json')))
 world.extend(json.load(open('deep_io_me_cc_im.json')))
+world.extend(json.load(open('deep_alt.json')))
 
 sum = len(world)
 count = 0

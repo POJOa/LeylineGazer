@@ -24,8 +24,26 @@ for w in words:
         words_res.append({w:words[w]})
 
 
-
 with open('statsSents.json', 'w') as file:
     file.write(json.dumps(sents_res))
 with open('topWords.json', 'w') as file:
     file.write(json.dumps(words_res))
+
+def k(x):
+    for (k,v) in x.items():
+        return v
+
+
+sents_res = sorted(sents_res, key=k)
+words_res = sorted(words_res, key=k)
+sents_res.reverse()
+words_res.reverse()
+
+for w in words:
+    for (k,v) in w.items():
+        if len(k)>1:
+            print(w)
+for s in sents:
+    print(s)
+
+
