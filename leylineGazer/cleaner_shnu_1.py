@@ -4,8 +4,6 @@ import sys
 import pickle
 
 import logging
-from multiprocessing.pool import Pool
-import multiprocessing
 from gensim import similarities
 import pymongo
 from gensim import corpora
@@ -18,7 +16,6 @@ logger = logging.getLogger(program)
 logging.basicConfig(format=' %(process)d: %(asctime)s: %(levelname)s: %(message)s')
 logging.root.setLevel(level=logging.INFO)
 logger.info("running %s" % ' '.join(sys.argv))
-manager = multiprocessing.Manager()
 
 '''
 sum = world.count()
@@ -80,46 +77,21 @@ print('similarity save')
 
 
 
-all_deleted = []
 
-def tsk(i,sim,idmap):
-    client = MongoClient('mongodb://localhost:27017/')
-    db = client.shnu_site
-    news_collection = db.News
-    deleted = []
-    print('process start')
-    self_id = i['_id']
-    if self_id in all_deleted:
-        print(str(self_id) + ' has already been deleted')
-        return
-
-    for (k,v) in sim:
-        target_id=idmap[k]
-        if v>0.9999 and target_id!=self_id:
-            try:
-                print(str(target_id) + ' will be removed due to high similarity with  '+str(self_id))
-                news_collection.remove({"_id":target_id})
-                deleted.append(target_id)
-            except Exception as e:
-                print(str(e) + ' is failed')
-    print('process end')
-
-    all_deleted.append(l for l in deleted)
-
-
-# noinspection PyArgumentList
-
-def main():
+def clean(limit,skip,count):
+    print('running')
+    pId = count
     client = MongoClient('mongodb://localhost:27017/')
     db = client.shnu_site
     news_collection = db.News
     news_collection_raw = db.News_backup
-    world = news_collection.find(no_cursor_timeout=True).sort("_id", 1)
+    world = news_collection.find(no_cursor_timeout=True).sort("_id", 1).limit(limit).skip(skip)
     world_raw = news_collection_raw.find(no_cursor_timeout=True).sort("_id", 1)
-    jieba.enable_parallel(4)
+    #jieba.enable_parallel(4)
 
 
     idmap = []
+
 
     for i in world_raw:
         idmap.append(i['_id'])
@@ -129,26 +101,44 @@ def main():
     dictionary = corpora.Dictionary.load('./shnu/similarity_dict.txt')
 
     count = 0
-    resColle = []
-    print('cutting text')
-    cut_texts = [jieba.cut(i['text']) for i in world]
-    print('generating corpus')
-    corpus = [dictionary.doc2bow(text) for text in cut_texts]
-    print('getting sim results')
-    simResColle = [(i,sim) for sim in similarity[corpus]]
+    to_del = []
+    print(str(pId),' - cutting text and generating corpus')
+    for i in world:
+        print(str(pId),' - processing no.', count , ' / ',str(limit))
+        count+=1
+        self_id = i['_id']
 
-    with open('pk.pkl', 'wb') as f:  # open file with write-mode
-        picklestring = pickle.dump(simResColle,f)  # serialize object
+        if(self_id in to_del or news_collection.find_one({"_id":self_id}) is None):
+            print(str(pId),' - '+ str(self_id) , ' deleted')
+            continue
+        s = similarity[dictionary.doc2bow(jieba.cut(i['text']))]
+        for (k, v) in s:
+            target_id = idmap[k]
+            if v > 0.9999 and target_id != self_id:
+                try:
+                    news_collection.remove({"_id": target_id})
+                    print(str(pId), ' - ' + str(target_id) + ' will be deleted because of similarity to ', str(self_id))
+                    to_del.append(target_id)
+                except Exception as e:
+                    print(str(e))
 
+    try:
+        with open('pk-'+str(limit)+'-'+str(skip)+'.pkl', 'wb') as f:  # open file with write-mode
+            picklestring = pickle.dump(to_del,f)  # serialize object
+    except Exception as e:
+        print(str(e))
+        ''''
     count = 0
-    all = len(simResColle)
-    for (i,sim) in simResColle:
+    all = len(to_del)
+    for i in to_del:
         count += 1
-        print('processing ',str(count),' / ',str(all))
-        tsk(i,sim,idmap)
+        print(str(pId),' - deleting ',str(count),' / ',str(all))
+        news_collection.remove({"_id": i})
 
-    print(all_deleted)
+    '''
+    print(str(pId), ' - deleted')
+    print(len(to_del))
 
-if __name__ == '__main__':
-    main()
+    return len(to_del)
+
 
