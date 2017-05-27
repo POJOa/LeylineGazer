@@ -21,10 +21,11 @@ with open('./NEG.txt',encoding='utf-8',errors='ignore') as f:
     for line in f:
         neg.append(line.replace("\n",""))
 
-#model = Word2Vec.load('./shnu/w2v_0.bin')
+model = Word2Vec.load('./shnu/shnu_w2v.bin')
 #model = Word2Vec.load('./cut2_1.bin')
 
-model = word2vec.load('./juice.bin')
+
+#model = word2vec.load('./juice.bin')
 
 count = 0
 posres = []
@@ -39,7 +40,7 @@ for w in pos:
         continue
     countres=0
     for (k,v) in indexes:
-        if k not in pos and inChinese(k) and len(k)>1 and k not in posres:
+        if k not in pos and inChinese(k) and len(k) == len(w) and k not in posres:
             countres+=1
             if(countres>2):
                 break
@@ -51,22 +52,23 @@ for w in neg:
 #    if(count >100):
 #        break
     try:
-        #indexes = model.most_similar(w)
-        indexes = model.cosine(w)
+        indexes = model.most_similar(w)
+        #indexes = model.cosine(w)
 
     except Exception as e:
         continue
     countres=0
-    '''
+
     for (k,v) in indexes:
-        if k not in neg and inChinese(k) and len(k)>1 and k not in negres:
+        if k not in neg and inChinese(k) and len(k) == len(w) and k not in negres:
             countres+=1
             if(countres>2):
                 break
             negres.append(k)
             print(k+' '+w)
-    '''
 
+
+    '''
     for i in indexes[0]:
         k=model.vocab[i]
         if k not in neg and inChinese(k) and len(k)>1 and k not in negres:
@@ -75,11 +77,11 @@ for w in neg:
                 break
             negres.append(k)
             print(k+' '+w)
-
-with open('./POS_extended_juice.txt',mode="w",encoding='utf-8',errors='ignore') as f:
+    '''
+with open('./shnu/shnu_pos_extended.txt',mode="w",encoding='utf-8',errors='ignore') as f:
     for k in posres:
         f.write(k+'\n')
 
-with open('./NEG_extended_juice.txt',mode="w",encoding='utf-8',errors='ignore') as f:
+with open('./shnu/shnu_neg_extended.txt',mode="w",encoding='utf-8',errors='ignore') as f:
     for k in negres:
         f.write(k+'\n')

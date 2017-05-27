@@ -4,13 +4,13 @@ import jieba
 import jieba.posseg
 import re
 import random
-model = Word2Vec.load('./shnu/w2v_0.bin')
+model = Word2Vec.load('./shnu/shnu_w2v.bin')
 
 words = []
 txt = ''
 original = ''
 jieba.enable_parallel(4)
-ignored = ['ns','nrt','b','nr','nt','vn','nz','vd','n','uj','r','x','c','t','m','l']
+ignored = ['ns','nrfg','nrt','b','nr','nt','vn','nz','vd','n','uj','r','x','c','t','m','l','eng']
 
 
 def initindexs(char, string):
@@ -52,9 +52,9 @@ def inChinese(c):
     except Exception as e:
         return None
 
-with open('./shnu/example.txt',encoding='utf-8',errors='ignore') as f:
+with open('./shnu/topic_gen_model.txt',encoding='utf-8',errors='ignore') as f:
     for line in f:
-        l = jieba.posseg.cut(line)
+        l = jieba.posseg.cut(line, HMM=False)
         original+=line
         for i in l:
             word = i.word
@@ -76,10 +76,12 @@ with open('./shnu/example.txt',encoding='utf-8',errors='ignore') as f:
                 for (k,v) in suggested:
                     if word not in k \
                             and k not in word \
-                            and k not in txt: #TBD
-                        if len(word) == 2 and len(k)%2==0 and common_sub_exists(k,word):
+                            and k not in txt \
+                            and len(k)>1 \
+                            and inChinese(k): #TBD
+                        if len(word) == 2 and len(k)==2 or len(k)==4 and common_sub_exists(k,word):
                             candidates_best.append(k)
-                        elif len(word) == 2 and len(k)%2!=0:
+                        elif len(word) == 2:
                             candidates_secondary.append(k)
                         elif len(word) != 2 and common_sub_exists(k,word):
                             candidates_secondary.append(k)
@@ -100,10 +102,21 @@ with open('./shnu/example.txt',encoding='utf-8',errors='ignore') as f:
                 if candidate is not None:
                     txt+=candidate
                 else:
-                    indice = random.randint(0, len(suggested)-1)
-                    tuple = suggested[indice]
-                    txt+=tuple[0]
-                    print(word + i.flag+ ' --> shuffle: '+tuple[0])
+                    count = 0
+                    res = ''
+                    while True:
+                        indice = random.randint(0, len(suggested)-1)
+                        tuple = suggested[indice]
+                        if (count > 4):
+                            res+=word
+                            break
+                        count += 1
+                        if inChinese(tuple[0]):
+                            res+=tuple[0]
+                            break
+                    txt+=res
+                    if res != word:
+                        print(word + i.flag+ ' --> shuffle: '+res)
             else:
                 # not reachable
                 txt+=word

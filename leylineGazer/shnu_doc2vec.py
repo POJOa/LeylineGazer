@@ -28,9 +28,7 @@ class LabeledLineSentence(object):
         for source, prefix in self.sources.items():
             with utils.smart_open(source) as fin:
                 for item_no, line in enumerate(fin):
-                    line = line.replace("\n","")
-                    if line is not None and line != '':
-                        yield TaggedDocument(jieba.cut(line), [prefix + '_%s' % item_no])
+                    yield TaggedDocument(list(jieba.cut(line)), [prefix + '_%s' % item_no])
 
     def to_array(self):
         self.sentences = []
@@ -54,13 +52,15 @@ for name in files:
 
 
 sentences = LabeledLineSentence(sources)
-model = Doc2Vec(min_count=10, window=15, size=100, sample=1e-4, negative=10, workers=4)
-model.save('./d2v.bin')
-model.build_vocab(sentences.to_array())
-for epoch in range(10):
-    model.train(sentences.sentences_perm())
+model = Doc2Vec(sentences,min_count=5, window=15, size=100, sample=1e-4, negative=10, workers=4)
+model.save('./shnu/shnu_d2v_raw.bin')
 
+model.build_vocab(sentences.to_array())
+for epoch in range(20):
+    model.train(sentences.sentences_perm())
+model.save('./shnu/shnu_d2v_trained.bin')
 '''
+
 train_arrays = numpy.zeros((18293, 100))
 train_labels = numpy.zeros(18293)
 test_arrays = []

@@ -1,5 +1,5 @@
 import os
-from cleaner_shnu_1 import clean
+from shnu_cleaner_task import clean
 
 import sys
 import pickle

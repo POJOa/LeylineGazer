@@ -13,7 +13,7 @@ from bson.json_util import dumps
 
 client = MongoClient('mongodb://localhost:27017/')
 db = client.shnu_site
-news_collection_raw = db.News_backup
+news_collection = db.News
 
 program = os.path.basename(sys.argv[0])
 logger = logging.getLogger(program)
@@ -22,7 +22,7 @@ logging.root.setLevel(level=logging.INFO)
 logger.info("running %s" % ' '.join(sys.argv))
 
 world=[]
-with open('./EXP_DOC.txt',encoding='utf-8',errors='ignore') as f:
+with open('./shnu/topic_sim_model.txt',encoding='utf-8',errors='ignore') as f:
     for line in f:
         world.append(line.replace("\n",""))
 
@@ -37,9 +37,9 @@ for i in world:
     print(i)
     print('\n')
     for (k, v) in s:
-        if(v<0.9):
+        if(v < 0.9):
             print('相似度：',v)
-            target = news_collection_raw.find().skip(int(k)).limit(1)
+            target = news_collection.find().skip(int(k)).limit(1)
             print(target[0]['text'])
             print('\n')
             break
