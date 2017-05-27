@@ -10,7 +10,9 @@ import sklearn.metrics as metrics
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.externals import joblib
+from sklearn import svm
 
+import simplejson as json
 import jieba
 import logging
 import sys
@@ -119,19 +121,39 @@ for (k,v) in tags:
 
 test_arrays = []
 true_labels=[]
-
-a=open("/Users/bytenoob/PycharmProjects/leylineGazer/leylineGazer/shnu/classed_cut/xxjd.txt")
-b=open("/Users/bytenoob/PycharmProjects/leylineGazer/leylineGazer/shnu/classed_cut/renwen.txt")
-test_content1=a.readlines()
-test_content2=b.readlines()
+jieba.enable_parallel(4)
+a=json.load(open('./shnu/classification_pos.json',errors='ignore'))
+b=json.load(open('./shnu/classification_neg.json',errors='ignore'))
+test_content1=[]
+test_content2=[]
+for i in a:
+    test_content1.append(i['text'])
+for i in b:
+    test_content2.append(i['text'])
 for i in test_content1:
-    v = model.infer_vector(i.split())
+    v = model.infer_vector(list(jieba.cut(i)))
     test_arrays.append(v)
     true_labels.append(1)
 for i in test_content2:
-    v = model.infer_vector(i.split())
+    v = model.infer_vector(list(jieba.cut(i)))
     test_arrays.append(v)
     true_labels.append(0)
+clf = joblib.load("./shnu/train_model_svm.m")
+test_labels_SVM=[]
+preds = clf.predict(test_arrays)
+print(metrics.accuracy_score(preds,true_labels))
+print(confusion_matrix(preds,true_labels))
+'''
+for i in range(len(test_arrays)):
+     print(count , ' / ', len(test_arrays))
+     count+=1
+     #test_labels_LR.append(classifier.predict([test_arrays[i]]))
+     test_labels_SVM.append(clf.predict([test_arrays[i]]))
+print("SVM:")
+print(metrics.accuracy_score(test_labels_SVM,true_labels))
+print(confusion_matrix(test_labels_SVM,true_labels))
+'''
+'''
 #print('classifier init')
 #classifier = LogisticRegression(class_weight={0:0.38,1:0.62})
 #print('classifier fit')
@@ -139,17 +161,11 @@ for i in test_content2:
 #RF = RandomForestClassifier(n_estimators=1200,max_depth=14,class_weight={0:0.3,1:0.7})
 #RF.fit(train_arrays, train_labels)
 print('classifier init')
-GBDT = GradientBoostingClassifier(n_estimators=1000,max_depth=14)
-GBDT.fit(train_arrays, train_labels)
-joblib.dump(GBDT, "./shnu/train_model_gbdt.m")
+GBDT=joblib.load("./shnu/train_model_gbdt.m")
 print('rf fit')
-RF = RandomForestClassifier(n_estimators=1200,max_depth=14,class_weight={0:0.3,1:0.7})
-RF.fit(train_arrays, train_labels)
-joblib.dump(RF, "./shnu/train_model_rf.m")
+RF=joblib.load("./shnu/train_model_rf.m")
 print('classifier fit')
-classifier = LogisticRegression(class_weight={0:0.38,1:0.62})
-classifier.fit(train_arrays, train_labels)
-joblib.dump(classifier, "./shnu/train_model_rf.m")
+classifier = joblib.load("./shnu/train_model_rf.m")
 
 test_labels_LR=[]
 test_labels_RF=[]
@@ -158,19 +174,19 @@ count = 0
 for i in range(len(test_arrays)):
      print(count , ' / ', len(test_arrays))
      count+=1
-     test_labels_LR.append(classifier.predict([test_arrays[i]]))
+     #test_labels_LR.append(classifier.predict([test_arrays[i]]))
      test_labels_RF.append(RF.predict([test_arrays[i]]))
      test_labels_GBDT.append(GBDT.predict([test_arrays[i]]))
-print("LR:")
-print(classifier.score(test_labels_LR, true_labels))
-print(confusion_matrix(test_labels_LR,true_labels))
+#print("LR:")
+#print(classifier.score(test_labels_LR, true_labels))
+#print(confusion_matrix(test_labels_LR,true_labels))
 print("RF:")
 print(metrics.accuracy_score(test_labels_RF,true_labels))
 print(confusion_matrix(test_labels_RF,true_labels))
 print("GBDT:")
 print(metrics.accuracy_score(test_labels_GBDT,true_labels))
 print(confusion_matrix(test_labels_GBDT,true_labels))
-
+'''
 '''
 train_arrays = numpy.zeros((18293, 100))
 train_labels = numpy.zeros(18293)

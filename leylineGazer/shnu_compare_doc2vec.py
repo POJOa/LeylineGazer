@@ -17,7 +17,7 @@ with open('./EXP.txt',encoding='utf-8',errors='ignore') as f:
     for line in f:
         pos.append(line.replace("\n",""))
 
-model_shnu = Word2Vec.load('./shnu/shnu_w2v.bin')
+model_shnu = Word2Vec.load('./shnu/shnu_w2v_alt.bin')
 model_blog = Word2Vec.load('./cut2_1.bin')
 model_sohu = word2vec.load('./juice.bin')
 
