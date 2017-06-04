@@ -84,10 +84,7 @@ neg=['xzx',
 
 count = 1
 all = len(pos)
-
 for name in pos:
-    print(count , ' / ' , all)
-    count+=1
     f = open(dest+name+'.txt',errors='ignore')
     train_docs = f.readlines()
     for train_doc in train_docs:
@@ -115,8 +112,6 @@ print('pos vector extracted')
 count = 1
 all = len(neg)
 for name in neg:
-    print(count , ' / ' , all)
-    count+=1
     f = open(dest + name + '.txt',errors='ignore')
     train_docs = f.readlines()
     for train_doc in train_docs:
@@ -135,10 +130,7 @@ for name in neg:
             vector = vector / word_num
             vector_alt = vector_alt / word_num
         x_train_neg.append(vector)
-        x_train_pos_alt.append(vector_alt)
-
-
-print('neg vector extracted')
+        x_train_neg_alt.append(vector_alt)
 
 
 count = 1
@@ -187,7 +179,7 @@ counts_all = count_v0.fit_transform(train_txt)
 count_v1= CountVectorizer(vocabulary=count_v0.vocabulary_)
 counts_train = count_v1.fit_transform(train_text_x)
 count_v2= CountVectorizer(vocabulary=count_v0.vocabulary_)
-counts_test = count_v1.fit_transform(test_text_x)
+counts_test = count_v2.fit_transform(test_text_x)
 tfidftransformer = TfidfTransformer()
 train_data = tfidftransformer.fit(counts_train).transform(counts_train)
 test_data = tfidftransformer.fit(counts_test).transform(counts_test)
@@ -212,139 +204,112 @@ train_x_alt,test_x_alt, train_y_alt, test_y_alt = train_test_split(train_alt,
                                                    test_size = 0.2,
                                                    random_state = 0)
 
+
 print(len(train_x), len(test_x))
 print(len(train_y), len(test_y))
+
 
 print(len(train_x_alt), len(test_x_alt))
 print(len(train_y_alt), len(test_y_alt))
 
 print('random ok')
 
-print('svc rbf')
-svc_rbf=svm.SVC(kernel='rbf')
-svc_rbf.fit(train_x,train_y)
-joblib.dump(svc_rbf,'./shnu/shnu_w2v_svc_rbf.m')
+print('sohu word2vec bin + svm(rbf)')
+svc_rbf=joblib.load('./shnu/shnu_w2v_svc_rbf.m')
 preds = svc_rbf.predict(test_x)
 print(metrics.classification_report(test_y, preds))
 print(metrics.confusion_matrix(test_y, preds))
 
-print('svc linear')
-svc_rbf=svm.SVC(kernel='linear')
-svc_rbf.fit(train_x,train_y)
-joblib.dump(svc_rbf,'./shnu/shnu_w2v_svc_linear.m')
-preds = svc_rbf.predict(test_x)
+
+print('sohu word2vec bin + svm(linear)')
+svc_l=joblib.load('./shnu/shnu_w2v_svc_linear.m')
+preds = svc_l.predict(test_x)
 print(metrics.classification_report(test_y, preds))
 print(metrics.confusion_matrix(test_y, preds))
 
-print('nb_m')
+print('sohu word2vec bin + naive bayes(Multinomial)')
 
-nb_m = MultinomialNB()
-nb_m.fit(minmax_scale(train_x),train_y)
-joblib.dump(nb_m,'./shnu/shnu_w2v_nb_m.m')
+nb_m=joblib.load('./shnu/shnu_w2v_nb_m.m')
 preds=nb_m.predict(test_x)
 print(metrics.classification_report(test_y, preds))
 print(metrics.confusion_matrix(test_y, preds))
 
-print('nb_b')
+print('sohu word2vec bin + naive bayes(Bernoulli)')
 
-nb_b = BernoulliNB()
-nb_b.fit(train_x,train_y)
-joblib.dump(nb_b,'./shnu/shnu_w2v_nb_b.m')
+nb_b=joblib.load('./shnu/shnu_w2v_nb_b.m')
 preds=nb_b.predict(test_x)
 print(metrics.classification_report(test_y, preds))
 print(metrics.confusion_matrix(test_y, preds))
 
 
 
-print('nb_g_w2v')
-
-nb_g = GaussianNB()
-nb_g.fit(train_x,train_y)
-joblib.dump(nb_g,'./shnu/shnu_w2v_nb_g.m')
+print('sohu word2vec bin + naive bayes(Gaussian)')
+nb_g=joblib.load('./shnu/shnu_w2v_nb_g.m')
 preds=nb_g.predict(test_x)
 print(metrics.classification_report(test_y, preds))
 print(metrics.confusion_matrix(test_y, preds))
 
-print('svc rbf')
-svc_rbf=svm.SVC(kernel='rbf')
-svc_rbf.fit(train_x_alt,train_y_alt)
-joblib.dump(svc_rbf,'./shnu/shnu_w2v_svc_rbf_alt.m')
+
+print('shnu word2vec bin + svm(rbf)')
+svc_rbf=joblib.load('./shnu/shnu_w2v_svc_rbf_alt.m')
 preds = svc_rbf.predict(test_x_alt)
 print(metrics.classification_report(test_y_alt, preds))
 print(metrics.confusion_matrix(test_y_alt, preds))
 
-print('svc linear')
-svc_l=svm.SVC(kernel='linear')
-svc_l.fit(train_x_alt,train_y_alt)
-joblib.dump(svc_l,'./shnu/shnu_w2v_svc_linear_alt.m')
+
+print('shnu word2vec bin + svm(linear)')
+svc_l=joblib.load('./shnu/shnu_w2v_svc_linear_alt.m')
 preds = svc_l.predict(test_x_alt)
 print(metrics.classification_report(test_y_alt, preds))
 print(metrics.confusion_matrix(test_y_alt, preds))
 
-print('nb_m')
+print('shnu word2vec bin + naive bayes(Multinomial)')
 
-nb_m = MultinomialNB()
-nb_m.fit(minmax_scale(train_x_alt),train_y_alt)
-joblib.dump(nb_m,'./shnu/shnu_w2v_nb_m_alt.m')
+nb_m=joblib.load('./shnu/shnu_w2v_nb_m_alt.m')
 preds=nb_m.predict(test_x_alt)
 print(metrics.classification_report(test_y_alt, preds))
 print(metrics.confusion_matrix(test_y_alt, preds))
 
-print('nb_b')
+print('shnu word2vec bin + naive bayes(Bernoulli)')
 
-nb_b = BernoulliNB()
-nb_b.fit(train_x_alt,train_y_alt)
-joblib.dump(nb_b,'./shnu/shnu_w2v_nb_b_alt.m')
+nb_b=joblib.load('./shnu/shnu_w2v_nb_b_alt.m')
 preds=nb_b.predict(test_x_alt)
 print(metrics.classification_report(test_y_alt, preds))
 print(metrics.confusion_matrix(test_y_alt, preds))
 
 
-
-print('nb_g_w2v')
-
-nb_g = GaussianNB()
-nb_g.fit(train_x_alt,train_y_alt)
-joblib.dump(nb_g,'./shnu/shnu_w2v_nb_g_alt.m')
+print('shnu word2vec bin + naive bayes(Gaussian)')
+nb_g=joblib.load('./shnu/shnu_w2v_nb_g_alt.m')
 preds=nb_g.predict(test_x_alt)
 print(metrics.classification_report(test_y_alt, preds))
 print(metrics.confusion_matrix(test_y_alt, preds))
 
+print('MultinomialNB')
 
-print('nb_m')
-
-nb_m = MultinomialNB()
-nb_m.fit(train_data,train_text_y)
-joblib.dump(nb_m,'./shnu/shnu_nb_m.m')
+nb_m=joblib.load('./shnu/shnu_nb_m.m')
 preds=nb_m.predict(test_data)
 print(metrics.classification_report(test_text_y, preds))
 print(metrics.confusion_matrix(test_text_y, preds))
 
-print('nb_b')
+print('BernoulliNB')
 
-nb_b = BernoulliNB()
-nb_b.fit(train_data,train_text_y)
-joblib.dump(nb_b,'./shnu/shnu_nb_b.m')
+nb_b=joblib.load('./shnu/shnu_nb_b.m')
 preds=nb_b.predict(test_data)
 print(metrics.classification_report(test_text_y, preds))
 print(metrics.confusion_matrix(test_text_y, preds))
 
-print('svm_rbf')
+print('svm linear')
 
-svclf = svm.SVC(kernel = 'rbf')
-svclf.fit(train_data,train_text_y)
-joblib.dump(svclf,'./shnu/shnu_svm_r.m')
-
+svclf = joblib.load('./shnu/shnu_svm_l.m')
 preds = svclf.predict(test_data)
 print(metrics.classification_report(test_text_y, preds))
 print(metrics.confusion_matrix(test_text_y, preds))
 
-print('svm_linear')
-svclf = svm.SVC(kernel = 'linear')
-svclf.fit(train_data,train_text_y)
-joblib.dump(svclf,'./shnu/shnu_svm_l.m')
 
-preds = svclf.predict(test_data)
+print('svm rbf')
+
+svmr = joblib.load('./shnu/shnu_svm_r.m')
+preds = svmr.predict(test_data)
 print(metrics.classification_report(test_text_y, preds))
 print(metrics.confusion_matrix(test_text_y, preds))
 

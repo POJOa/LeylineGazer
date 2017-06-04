@@ -93,12 +93,18 @@ x_train_text = tfidftransformer.fit(counts_train).transform(counts_train)
 
 
 
-m=joblib.load('./shnu/shnu_svm_l.m')
-print('svm linear tf-idf')
+m=joblib.load('./shnu/shnu_svm_r.m')
+print('svm rbf')
 preds = m.predict(x_train_text)
 print(metrics.classification_report(y_train_text, preds))
 print(metrics.confusion_matrix(y_train_text, preds))
 
+
+m=joblib.load('./shnu/shnu_svm_l.m')
+print('svm linear')
+preds = m.predict(x_train_text)
+print(metrics.classification_report(y_train_text, preds))
+print(metrics.confusion_matrix(y_train_text, preds))
 
 m=joblib.load('./shnu/shnu_nb_b.m')
 print('BernoulliNB')
