@@ -18,6 +18,8 @@ with open('./EXP.txt',encoding='utf-8',errors='ignore') as f:
         pos.append(line.replace("\n",""))
 
 model_shnu = Word2Vec.load('./shnu/shnu_w2v_alt.bin')
+model_shnu_damned = Word2Vec.load('./shnu/shnu_w2v.bin')
+
 model_blog = Word2Vec.load('./cut2_1.bin')
 model_sohu = word2vec.load('./juice.bin')
 
@@ -30,8 +32,11 @@ for w in pos:
 #        break
     try:
         indexes_shnu = model_shnu.most_similar(w)
+        indexes_shnu_damned = model_shnu_damned.most_similar(w)
+
     except Exception as e:
         indexes_shnu = []
+        indexes_shnu_damned = []
         #print('shnu model miss for word '+w)
 
     try:
@@ -46,9 +51,15 @@ for w in pos:
         indexes_sohu = []
         #print('sohu model miss for word ' + w)
 
-    print('上海师大校园网 - ' + w + '：')
+    print('上海师大校园网 window 5- ' + w + '：')
     str_shnu=''
     for (k,v) in indexes_shnu:
+        str_shnu+=(k+' ')
+    print(str_shnu)
+
+    print('上海师大校园网 window 15- ' + w + '：')
+    str_shnu=''
+    for (k,v) in indexes_shnu_damned:
         str_shnu+=(k+' ')
     print(str_shnu)
 

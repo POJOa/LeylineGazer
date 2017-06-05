@@ -4,13 +4,14 @@ import jieba
 import jieba.posseg
 import re
 import random
-model = Word2Vec.load('./shnu/shnu_w2v.bin')
+model = Word2Vec.load('./shnu/shnu_w2v_alt.bin')
 
 words = []
 txt = ''
 original = ''
 jieba.enable_parallel(4)
 ignored = ['ns','nrfg','nrt','b','nr','nt','vn','nz','vd','n','uj','r','x','c','t','m','l','eng']
+#ignored = []
 
 
 def initindexs(char, string):
@@ -65,6 +66,7 @@ with open('./shnu/topic_gen_model.txt',encoding='utf-8',errors='ignore') as f:
                 suggested = model.most_similar(word)
             except Exception as e:
                 print(word + 'is not found')
+                suggested = []
                 txt+=word
 
 
@@ -79,7 +81,8 @@ with open('./shnu/topic_gen_model.txt',encoding='utf-8',errors='ignore') as f:
                             and k not in txt \
                             and len(k)>1 \
                             and inChinese(k): #TBD
-                        if len(word) == 2 and len(k)==2 or len(k)==4 and common_sub_exists(k,word):
+                        #if len(word) == 2 and len(k)==2 or len(k)==4 and common_sub_exists(k,word):
+                        if len(word) == 2 and len(k)==2 and common_sub_exists(k,word):
                             candidates_best.append(k)
                         elif len(word) == 2:
                             candidates_secondary.append(k)

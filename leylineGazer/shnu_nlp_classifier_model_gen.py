@@ -177,7 +177,7 @@ target=[1]*len(text_train_pos)+[0]*len(text_train_neg)
 train_text_x,test_text_x, train_text_y, test_text_y = train_test_split(train_txt,
                                                    target,
                                                    test_size = 0.2,
-                                                   random_state = 0)
+                                                    random_state = 0)
 
 #nb
 

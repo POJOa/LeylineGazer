@@ -30,7 +30,7 @@ logging.root.setLevel(level=logging.INFO)
 logger.info("running %s" % ' '.join(sys.argv))
 w2v_model_alt = Word2Vec.load('./shnu/shnu_w2v_alt.bin').wv
 w2v_model = KeyedVectors.load_word2vec_format('./juice.bin',unicode_errors='ignore',binary=True)
-
+Word2Vec.load('./shnu/shnu_w2v_alt.bin')
 dest = "./shnu/classed_cut/"
 files = os.listdir(dest)
 sources = {}
