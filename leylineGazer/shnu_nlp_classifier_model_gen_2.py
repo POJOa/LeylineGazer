@@ -28,7 +28,7 @@ logger = logging.getLogger(program)
 logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
 logging.root.setLevel(level=logging.INFO)
 logger.info("running %s" % ' '.join(sys.argv))
-w2v_model = Word2Vec.load('./shnu/shnu_w2v_alt_trained_300_uncut_lined.bin').wv
+w2v_model = Word2Vec.load('./shnu/shnu_w2v_alt_trained_1500_uncut_lined.bin').wv
 
 dest = "./shnu/classed_cut/"
 files = os.listdir(dest)
@@ -91,7 +91,7 @@ for name in pos:
     train_docs = f.readlines()
     for train_doc in train_docs:
         words = train_doc.split()
-        vector = np.zeros(300)
+        vector = np.zeros(1500)
         word_num = 0
         for word in words:
             if word in w2v_model:
@@ -114,7 +114,7 @@ for name in neg:
     train_docs = f.readlines()
     for train_doc in train_docs:
         words = train_doc.split()
-        vector = np.zeros(300)
+        vector = np.zeros(1500)
         word_num = 0
         for word in words:
             if word in w2v_model:
@@ -151,7 +151,7 @@ print('random ok')
 print('svc linear')
 svc_rbf=svm.SVC(kernel='linear')
 svc_rbf.fit(train_x,train_y)
-joblib.dump(svc_rbf,'./shnu/shnu_w2v_svc_linear_train_w2v_encore_uc_lined_300.m')
+joblib.dump(svc_rbf,'./shnu/shnu_w2v_svc_linear_train_w2v_encore_uc_lined_1500.m')
 preds = svc_rbf.predict(test_x)
 print(metrics.classification_report(test_y, preds))
 print(metrics.confusion_matrix(test_y, preds))

@@ -27,6 +27,6 @@ logging.root.setLevel(level=logging.INFO)
 logger.info("running %s" % ' '.join(sys.argv))
 
 #model = Word2Vec(LineSentence('./shnu/shnu_cut.txt'), size=400, window=15, min_count=5, negative=10, workers=4)
-model = Word2Vec(LineSentence('./shnu/classed_cut/all.txt'), size=400, window=5, min_count=1, workers=4)
-model.save('./shnu/shnu_w2v_alt_trained_400_uncut_lined.bin')
+model = Word2Vec(LineSentence('./shnu/classed_cut/all.txt'), size=1500, window=5, min_count=1, workers=4)
+model.save('./shnu/shnu_w2v_alt_trained_1500_uncut_lined.bin')
 #model.wv.save_word2vec_format('cut2_2.txt', binary=False)

@@ -30,7 +30,7 @@ logger = logging.getLogger(program)
 logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
 logging.root.setLevel(level=logging.INFO)
 logger.info("running %s" % ' '.join(sys.argv))
-w2v_model = Word2Vec.load('./shnu/shnu_w2v_alt_trained_400_uncut_lined.bin').wv
+w2v_model = Word2Vec.load('./shnu/shnu_w2v_alt_trained_1500_uncut_lined.bin').wv
 jieba.enable_parallel(4)
 
 dest = "./shnu/"
@@ -59,7 +59,7 @@ for name in pos:
     train_docs = json.load(f)
     for train_doc in train_docs:
         words = jieba.cut(train_doc['text'])
-        vector = np.zeros(400)
+        vector = np.zeros(1500)
 
         word_num = 0
         words = list(words)
@@ -86,7 +86,7 @@ for name in neg:
     train_docs = json.load(f)
     for train_doc in train_docs:
         words = jieba.cut(train_doc['text'])
-        vector = np.zeros(400)
+        vector = np.zeros(1500)
 
         word_num = 0
         words = list(words)
@@ -111,7 +111,7 @@ x_train.extend(x_train_neg)
 y_train=[1]*len(x_train_pos)+[0]*len(x_train_neg)
 
 
-m=joblib.load('./shnu/shnu_w2v_svc_linear_train_w2v_encore_uc_lined_400.m')
+m=joblib.load('./shnu/shnu_w2v_svc_linear_train_w2v_encore_uc_lined_1500.m')
 print('sohu w2v svm linear')
 preds = m.predict(x_train)
 print(metrics.classification_report(y_train, preds))
